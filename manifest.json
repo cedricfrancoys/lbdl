@@ -1,0 +1,7 @@
+{
+    "name": "lbdl",
+    "depends_on": [
+        "core"
+    ],
+    "apps": ["lbdl"]
+}

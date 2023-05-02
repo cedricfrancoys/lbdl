@@ -1,0 +1,80 @@
+{
+    "name": "Settings menu",
+    "access": {
+        "groups": ["setting.default.user"]
+    },
+    "layout": {
+        "items": [
+            {
+
+                "id": "base",
+                "label": "Base",
+                "description": "",
+                "icon": "now_widgets",
+                "type": "parent",
+                "route": "/settings/core",
+                "children": [
+                    {
+                        "id": "security",
+                        "label": "Security",
+                        "description": "",
+                        "icon": "lock_open",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "permissions",
+                                "type": "entry",
+                                "label": "Permissions",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\Permission",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "users",
+                                "type": "entry",
+                                "label": "Users",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\User",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "groups",
+                                "type": "entry",
+                                "label": "Groups",
+                                "description": "",
+                                "context": {
+                                    "entity": "core\\Group",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    }                         
+                ]
+            },
+            {
+                "id": "lbdl",
+                "label": "lbdl",
+                "description": "",
+                "icon": "now_widgets",
+                "type": "parent",
+                "route": "/",
+                "children": [
+                    {
+                        "id": "maps",
+                        "type": "entry",
+                        "label": "Maps",
+                        "description": "",
+                        "context": {
+                            "entity": "lbdl\\Map",
+                            "view": "list.default"
+                        }
+                    }            
+                ]
+            }
+        ]
+    }
+}

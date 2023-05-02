@@ -1,0 +1,13 @@
+{
+    "name": "lbdl",
+    "description": "",
+    "url": "/lbdl",
+    "icon": "play_circle",
+    "color": "#29A1A1",
+    "access": {
+        "groups": [
+            "users"
+        ]
+    },
+    "show_in_apps": true
+}

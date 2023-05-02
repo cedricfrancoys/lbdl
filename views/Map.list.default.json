@@ -1,0 +1,42 @@
+{
+    "name": "Maps",
+    "description": "List of maps.",
+    "order": "created",
+    "sort": "desc",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "25%",
+                "widget": {
+                    "sortable": true
+                }
+            },
+            {
+                "type": "field",
+                "value": "creator",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "created",
+                "width": "15%",
+                "widget": {
+                    "usage": "datetime/short",
+                    "sortable": true
+                }
+            },
+            {
+                "type": "field",
+                "label": "Sent",
+                "value": "modified",
+                "width": "15%",
+                "widget": {
+                    "usage": "datetime/short",
+                    "sortable": true
+                }
+            }
+       ]
+    }
+}
