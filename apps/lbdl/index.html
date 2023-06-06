@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="keywords" content="online playing, online gaming, online games, game, push game, maze game, puzzle game, board game" />
+<meta name="description" content="Come and play to the Little Blue Dwarf Land, feel free to play some levels and to create new ones ..." />
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="styles.css" type="text/css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Lakki+Reddy">
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="map.js"></script>
+<script src="user.js"></script>
+<script src="lang.js"></script>
+
+<script>
+    function selectSection(section) {
+        console.log('selecting', section);
+        $('#left_pane').find('div.selected').removeClass('selected');
+        $('#section-selector_'+section).addClass('selected');
+        $('#section_'+section).addClass('selected');
+
+        /**
+         * load selected section
+         */
+        var url;
+        switch(section) {
+            case 'news':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    domain: '[status,=,published]',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'created', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'easy':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'difficulty', sort: 'asc'
+                }))
+                .toString();
+                break;
+            case 'difficult':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'difficulty', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'most-played':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'count_games', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'most-liked':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'count_likes', sort: 'desc'
+                }))
+                .toString();
+                break;
+        }
+
+        fetch(url)
+        .then(async (response) => {
+            var $template = $('#template-map');
+            const maps = await response.json();
+            maps.forEach( (map) => {
+                const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+                var $map = (new Map(map)).miniMap();
+                var $item = $template.clone().removeAttr('id');;
+                // decorate template
+                $item.find('.map-thumb').append($map);
+                $item.find('.map-name').text(map.name);
+                $item.find('.map-author').text(map.author);
+                $item.find('.map-difficulty').append( $("<img>").prop('src', "assets/img/difficult_"+map.difficulty+".png") );
+                $item.find('.map-date').text(new Date(map.created).toLocaleDateString('fr-BE'));
+                $item.find('.map-likes').text(formatter.format(map.count_likes));
+                $item.find('.map-games').text(formatter.format(map.count_games));
+                $item.on('click', () => {
+                    window.location.href="./play.html?level="+map.id;
+                });
+                // insert item
+                $('#section_'+section).find('.maps').append($item);
+            });
+        })
+        .catch( (response) => {
+            // There was an error
+            console.warn('Something went wrong while requesting section.', response);
+        });
+    }
+
+    $(document).ready( () => {
+
+        selectSection('news');
+
+        /**
+         * load hall of fame (players)
+         */
+
+        fetch('/?get=lbdl_players')
+        .then(async (response) => {
+            var $template = $('#template-player');
+            const players = await response.json();
+            players.forEach( (player) => {
+                const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+                var $item = $template.clone().removeAttr('id');
+                // decorate template
+                $item.find('.player-name').text(player.firstname);
+                $item.find('.player-maps').text(formatter.format(player.count_maps));
+                $item.find('.player-games').text(formatter.format(player.count_plays)).attr('title', player.count_plays);
+                /*
+                // #todo
+                $item.on('click', () => {
+                    window.location.href="./player.html?player="+player.id;
+                });
+                */
+                // insert item
+                $('#high-scores').append($item);
+            });
+        })
+        .catch( (response) => {
+            // There was an error
+            console.warn('Something went wrong while requesting players.', response);
+        });
+
+    });
+
+</script>
+</head>
+
+<body>
+
+    <div id="main_container">
+        <!-- search bar -->
+        <div style="width: 100%; margin: auto; position: relative;">
+            <h1 style="font-family: 'Lakki Reddy'; text-align: center; margin: 0; padding-top: 10px;"><span i18n data-id="lbdl_welcome">Bienvenue à</span> <br />Little Blue Dwarf Land !</h1>
+            <p style="text-align: center;">
+                <span i18n data-id="lbdl_game">Le célèbre jeu en ligne désormais </span><a href="https://github.com/cedricfrancoys/lbdl">Open Source</a> <span><a href="https://github.com/cedricfrancoys/lbdl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a></span>, <span i18n data-id="lbdl_inspired">inspiré de la série "The Adventures of Lolo" sur </span> <a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System">NES</a>.
+            </p>
+            <p>
+                <span style="font-family: 'Lakki Reddy'; font-size: 25px;" i18n data-id="lbdl_here_we_are">Maintenant que tu es ici, tu peux :</span><br />
+                <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_play">Jouer</span> <span i18n data-id="lbdl_play_challenge">et tenter de battre les meilleurs scores.</span><br />
+                <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_create">Créer</span> <span i18n data-id="lbdl_create_share">de nouvelles cartes à soumettre aux autres joueurs.</span>
+            </p>
+
+            <div class="spacer" style="height: 60vh;" onclick="window.location.href='./play.html'">
+                <div class="hero">
+                    <img src="assets/img/lbdl_hero_play_off.png" style="object-fit: contain; width: 100%;">
+                    <img src="assets/img/lbdl_hero_play_on.png" style="object-fit: contain; width: 100%;">
+                </div>
+            </div>
+
+            <div style="margin-top: 150px; margin-bottom: 40px; font-family: 'Lakki Reddy'; font-size: 40px; text-align: center;" i18n data-id="presentation_rules">Les règles</div>
+
+            <div>
+                <div style="display: flex; align-items: center;">
+                    <div class="rules-item"><img src="skins/default/down.gif" style="width: 40px;"></div>
+                    <div class="rules-op" class="rules-op">+</div>
+                    <div class="rules-item"><img src="skins/default/water.gif" style="width: 40px;"></div>
+                    <div class="rules-op">=</div>
+                    <div class="rules-item"><img src="skins/default/sunk.gif" style="width: 40px;"></div>
+                    <div class="rules-text" i18n data-id="presentation_rules_water">tu ne sais pas nager</div>
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <div class="rules-item"><img src="skins/default/key.gif" style="width: 40px;"></div>
+                    <div class="rules-op">+</div>
+                    <div class="rules-item"><img src="skins/default/door.gif" style="width: 40px;"></div>
+                    <div class="rules-op">=</div>
+                    <div class="rules-item"><img src="skins/default/blank.gif" style="width: 40px;"></div>
+                    <div class="rules-text" i18n data-id="presentation_rules_door">une clé ouvre une porte</div>
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <div class="rules-item"><img src="skins/default/block.gif" style="width: 40px;"></div>
+                    <div class="rules-op">+</div>
+                    <div class="rules-item"><img src="skins/default/water.gif" style="width: 40px;"></div>
+                    <div class="rules-op">=</div>
+                    <div class="rules-item"><img src="skins/default/blank.gif" style="width: 40px;"></div>
+                    <div class="rules-text" i18n data-id="presentation_rules_block">un bloc permet de franchir l'eau</div>
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <div class="rules-item"><img src="skins/default/down.gif" style="width: 40px;"></div>
+                    <div class="rules-op">+</div>
+                    <div class="rules-item"><img src="skins/default/steps.gif" style="width: 40px;"></div>
+                    <div class="rules-op">=</div>
+                    <div class="rules-item"><img src="skins/default/won.gif" style="width: 40px;"></div>
+                    <div class="rules-text" i18n data-id="presentation_rules_stairs">aux escaliers, c'est gagné</div>
+                </div>
+
+            </div>
+
+            <div style="margin-top: 50px; margin-bottom: 40px; font-family: 'Lakki Reddy'; font-size: 40px; text-align: center;" i18n data-id="presentation_passing">Ca passe</div>
+            <div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div class="rules-item"><img src="skins/default/blank.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/key.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/steps.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/fake.gif" style="width: 40px;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 50px; margin-bottom: 40px; font-family: 'Lakki Reddy'; font-size: 40px; text-align: center;" i18n data-id="presentation_blocking">Ca passe pas</div>
+            <div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div class="rules-item"><img src="skins/default/block.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/water.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/bush.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/grid.gif" style="width: 40px;"></div>
+                    <div class="rules-item"><img src="skins/default/door.gif" style="width: 40px;"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- username and menu button -->
+    <div id="top_controls">
+        <!-- username -->
+        <div class="user-name"><span id="user-name--value">Guest user</span></div>
+        <div class="i18n-lang">
+            <select id="lang-selector">
+                <option value="fr">FR</option>
+                <option value="en">EN</option>
+            </select>
+        </div>
+        <!-- menu -->
+        <button id="menu-right" class="mdl-button mdl-js-button mdl-button--icon" style="margin-right: 8px;">
+            <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="menu-right">
+            <li class="mdl-menu__item" id="menu-login" i18n data-id="menu_login" onclick="window.location.href='/auth';">Login</li>
+            <li class="mdl-menu__item" id="menu-logout" i18n data-id="menu_logout" onclick="window.User.disconnect()">Logout</li>
+            <li class="mdl-menu__item" id="menu-editor" i18n data-id="menu_map_editor" onclick="window.location.href='edit.html';">Map editor</li>
+        </ul>
+    </div>
+
+    <!-- right pane - map info + scores -->
+    <div id="right_pane">
+        <div class="map-title" style="margin-top: 50px; padding-left: 10px; display: flex; align-items: center;">
+            <div style="display: flex; align-items: center; width: 100%; height: 25px; line-height: 25px;">
+                <span id="map-name--value" style="display: inline-block; font-size: 22px; font-weight: bold; max-width: 320px; white-space: nowrap;">Hall of Fame</span>
+            </div>
+        </div>
+
+        <div id="high-scores" class="high_scores">
+            <div class="title" i18n data-id="players_highlight_title">Les plus joueurs</div>
+        </div>
+    </div>
+
+
+    <!-- left pane - maps highlights -->
+    <div id="left_pane">
+        <div class="left_pane-menu">
+            <div class="section-selector selected" style="margin: auto; width :30px;" id="section-selector_news">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('news')" title="Newest">
+                    <i class="material-icons">fiber_new</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_easy">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('easy')" title="Easy">
+                    <i class="material-icons">wb_twilight</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_difficult">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('difficult')" title="Difficult">
+                    <i class="material-icons">priority_high</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_most-played">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('most-played')" title="Most played">
+                    <i class="material-icons">more_time</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_most-liked">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('most-liked')" title="Most liked">
+                    <i class="material-icons">favorite_outline</i>
+                </button>
+            </div>
+        </div>
+        <div class="left_pane-sections">
+            <div class="section selected" id="section_news">
+                <div class="title" i18n data-id="section_news">Nouveautés</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_easy">
+                <div class="title" i18n data-id="section_easy">Faciles</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_difficult">
+                <div class="title" i18n data-id="section_difficult">Difficiles</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_most-played">
+                <div class="title"  i18n data-id="section_most_played">Les plus joués</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_most-liked">
+                <div class="title" i18n data-id="section_most_liked">Les plus likés</div>
+                <div class="maps"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- templates -->
+    <div class="templates" style="display: none;">
+        <div id="template-map">
+            <div class="map-item">
+                <div class="map-thumb"></div>
+                <div style="
+                    font-size: 14px;
+                    text-transform: capitalize;
+                    width: calc(100% - 110px);
+                    margin: 0 10px;">
+                    <div class="map-name">Nom de la map</div>
+                    <div style="display: flex;
+                        justify-content: space-between;"><div class="map-author">auteur </div><div class="map-date">date</div></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div class="map-difficulty"></div>
+                        <div class="" style="margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">favorite</i><span class="map-likes"></span></div>
+                        <div class="" style="margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">play_circle</i><span class="map-games"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="template-player" style="display: flex; padding: 0 10px; align-items: center; justify-content: space-between;">
+            <div class="player-name" style="flex: 1;"></div>
+            <div class="" style="flex: 0 30%; margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">map</i><span class="player-maps"></span></div>
+            <div class="" style="flex: 0 30%; margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">play_circle</i><span class="player-games"></span></div>
+        </div>
+    </div>
+
+</body>
+</html>

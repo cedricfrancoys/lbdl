@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="keywords" content="online playing, online gaming, online games, game, push game, maze game, puzzle game, board game" />
+<meta name="description" content="Come and play to the Little Blue Dwarf Land, feel free to play some levels and to create new ones ..." />
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="styles.css" type="text/css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700">
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="board.js"></script>
+<script src="map.js"></script>
+<script src="user.js"></script>
+<script src="lang.js"></script>
+
+<script language="Javascript">
+
+	// default level (map id)
+	var level = 0;
+
+    /** @var Object board of the game */
+    var board = {};
+
+    var currentItem = 0;
+
+    /** Map object temporary store the map when trying it */
+    var currentMap = {};
+
+	var player = {
+		id: 0,
+		name: 'Guest'
+	};
+
+
+    function selectSection(section) {
+        console.log('selecting', section);
+        $('#left_pane').find('div.selected').removeClass('selected');
+        $('#section-selector_'+section).addClass('selected');
+        $('#section_'+section).addClass('selected');
+
+        /**
+         * load selected section
+         */
+        var url;
+        switch(section) {
+            case 'my':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    domain: '[[status,=,published],[creator,=,1]]',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'created', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'news':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    domain: '[status,=,published]',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'created', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'easy':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'difficulty', sort: 'asc'
+                }))
+                .toString();
+                break;
+            case 'difficult':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'difficulty', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'most-played':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'count_games', sort: 'desc'
+                }))
+                .toString();
+                break;
+            case 'most-liked':
+                url = '/?get=model_collect&'+ (new URLSearchParams({
+                    entity: 'lbdl\\Map',
+                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
+                    limit:15, order: 'count_likes', sort: 'desc'
+                }))
+                .toString();
+                break;
+        }
+
+        fetch(url)
+        .then(async (response) => {
+            var $template = $('#template-map');
+            const maps = await response.json();
+            maps.forEach( (map) => {
+                const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+                var $map = (new Map(map)).miniMap();
+                var $item = $template.clone().removeAttr('id');;
+                // decorate template
+                $item.find('.map-thumb').append($map);
+                $item.find('.map-name').text(map.name);
+                $item.find('.map-author').text(map.author);
+                $item.find('.map-difficulty').append( $("<img>").prop('src', "assets/img/difficult_"+map.difficulty+".png") );
+                $item.find('.map-date').text(new Date(map.created).toLocaleDateString('fr-BE'));
+                $item.find('.map-likes').text(formatter.format(map.count_likes));
+                $item.find('.map-games').text(formatter.format(map.count_games));
+                $item.on('click', () => {
+                    window.location.href="./play.html?level="+map.id;
+                });
+                // insert item
+                $('#section_'+section).find('.maps').append($item);
+            });
+        })
+        .catch( (response) => {
+            // There was an error
+            console.warn('Something went wrong while requesting section.', response);
+        });
+    }
+
+	function getMap() {
+		return map;
+	}
+
+	function getLevel() {
+		return level;
+	}
+
+	function getPlayer() {
+		return player;
+	}
+
+
+    function displayMapInfo(map) {
+        $("#map-author--value").text(map.author);
+        $("#map-name--value").text(map.name);
+        $("#map-status--value").text(map.status);
+        $("#map-newname--value").val(map.name).parent().addClass('is-dirty');
+        $("#map-created--value").text((new Date(map.created)).toLocaleDateString());
+        $("#map-difficulty--img").prop('src', "difficult_"+map.difficulty+".jpg");
+        $('#map-time--value').val(map.time).parent().addClass('is-dirty');
+        $('#map-keys--value').val(map.keys).parent().addClass('is-dirty');
+        if(map.status == 'published') {
+            $('#action-publish--btn').hide();
+        }
+        else {
+            $('#action-publish--btn').show();
+        }
+    }
+
+    function debounce(fn, delay) {
+        var timer = null;
+        return function () {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                fn.apply(context, args);
+            }, delay);
+        };
+    }
+
+
+    function chooseItem(item) {
+        $("#choice"+currentItem).removeClass('selected');
+        currentItem = item;
+        $("#choice"+currentItem).addClass('selected');
+    }
+
+
+    function placeItem(x, y) {
+        if (currentItem == START) {
+            board.setItem(board.getPosX(), board.getPosY(), EMPTY);
+            board.setPosX(x);
+            board.setPosY(y);
+            board.setItem(x, y, EMPTY);
+            board.setItem(x, y, MOVE_DOWN, true);
+        }
+        else {
+            board.setItem(x, y, currentItem);
+        }
+    }
+
+    /**
+     * public methods
+     */
+
+    /**
+     * Assign chosen skin to the layout.
+     */
+    function setSkin(skin) {
+        board.setSkin(skin);
+    }
+
+    /**
+     * Either reload the duplicated map to its original state, or resets to a blank map.
+     */
+    function reload() {
+        // board.reload();
+        load(getLevel());
+    }
+
+    /**
+     * Create a backup of the edited map.
+     */
+    function play() {
+        $('#action-play--btn').hide();
+        $('#action-stop--btn').show();
+        currentMap = board.exportMap();
+        board.listen(true);
+        board.play();
+    }
+
+    /**
+     *  Restore map.
+     */
+    function stop() {
+        $('#action-stop--btn').hide();
+        $('#action-play--btn').show();
+        board.listen(false);
+        board.setMap(currentMap);
+        init();
+    }
+
+    function save() {
+        currentMap = board.exportMap();
+        if(level == 0) {
+            $.post( "/?do=model_create", {
+                entity: 'lbdl\\Map',
+                fields: {name:currentMap.name}
+            })
+            .done(function(response) {
+                level = response.id;
+                $.post( "/?do=model_update", {
+                    entity: 'lbdl\\Map',
+                    id: level,
+                    fields: currentMap
+                })
+                .done(function( data ) {
+                    board.showPopup("saved", data);
+                });
+            })
+            .fail(function(response) {
+                // There was an error
+                console.warn('Something went wrong while creating a new map.', response);
+            });
+        }
+        else {
+            $.post( "/?do=model_update", {
+                entity: 'lbdl\\Map',
+                id: level,
+                fields: currentMap
+            })
+            .done(function( data ) {
+                board.showPopup("saved", data);
+            });
+        }
+    }
+
+    function publish() {
+        currentMap = board.exportMap();
+        $.post( "/?do=model_update", {
+            entity: 'lbdl\\Map',
+            id: level,
+            fields: {
+                'status': 'published'
+            }
+        })
+        .done(function( data ) {
+            board.showPopup("published", data);
+        });
+    }
+
+    function load(level) {
+        console.log('loading map', level);
+
+        var map = {
+            "name": "New map",
+            "created": (new Date()).toISOString(),
+            "pos_x": 0,
+            "pos_y": 0,
+            "keys": 0,
+            "time": 120,
+            "count_games": 0,
+            "count_likes": 0,
+            "author": "ced",
+            "board": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "difficulty": 1,
+            "direction": 12
+        };
+        if(level > 0) {
+            fetch('/?get=lbdl_map&id='+level)
+                .then(async (response) => {
+                    // The API call was successful!
+                    map = await response.json();
+                    board.setMap(map);
+                    board.loadPlayer(player);
+                    displayMapInfo(map);
+                    window.history.pushState({}, "", "?level="+level);
+                })
+                .catch( (response) => {
+                    // There was an error
+                    console.warn('Something went wrong while requesting map.', response);
+                });
+        }
+        else {
+            console.log(map);
+            board.setMap(map);
+            board.loadPlayer(player);
+            displayMapInfo(map);
+        }
+    }
+
+    function increase(elem, inc) {
+        var $this = $(elem).parent().find('input');
+        const val = parseInt($this.val());
+        $this.val(val+inc);
+        $this.change();
+    }
+
+    function decrease(elem, inc) {
+        var $this = $(elem).parent().find('input');
+        const val = parseInt($this.val());
+        $this.val(Math.max(0, val-inc));
+        $this.change();
+    }
+
+    function init() {
+        $('#game-board').find('.board-cell').on('click', function (event) {
+            const img = $(this).find('img')
+            const x = parseInt(img.attr('data-x'));
+            const y = parseInt(img.attr('data-y'));
+            placeItem(x, y);
+        });
+
+        $('#map-time--value').on('change', function () {
+            board.setTime(parseInt($(this).val())*1000);
+        });
+
+        $('#map-keys--value').on('change', function() {
+            board.setKeys(parseInt($(this).val()));
+        });
+
+        $("#map-newname--value").on('change', function() {
+            var new_name = $(this).val();
+            board.setName(new_name);
+            $("#map-name--value").text(new_name);
+        });
+    }
+
+    $(document).ready( async () => {
+
+        selectSection('my');
+
+        // retrieve level from query string, if any
+		const urlParams = new URLSearchParams(window.location.search);
+		if(urlParams.has('level')) {
+			level = urlParams.get('level');
+		}
+
+
+        User.get()
+        .then(function () {
+            $('#main').show();
+        })
+        .catch( (response) => {
+            $('#noauth').show();
+        });
+
+        board = new Board();
+
+        await load(getLevel());
+
+        init();
+    });
+
+</script>
+</head>
+
+<body>
+    <div id="noauth" style="display: none;">
+        <div style="width: 450px; margin: auto; text-align: center; margin-top: 20%; font-size: 22px;">
+            <span i18n data-id="edit_restricted">You must be authenticated to edit maps.</span>
+            <div style="display: flex; justify-content: space-around; margin-top: 40px;">
+                <a href="/lbdl/">
+                    <button class="mdl-button mdl-js-button mdl-button--primary">
+                        <i class="material-icons">home</i>
+                        <span i18n data-id="edit_goto_home">Aller à la page d'accueil</span>
+                    </button>
+                </a>
+                <a href="/auth/">
+                    <button class="mdl-button mdl-js-button mdl-button--primary">
+                        <i class="material-icons">login</i>
+                        <span i18n data-id="edit_auth">S'identifier</span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="main" style="display: none;">
+        <div id="main_container">
+            <!-- search bar -->
+            <div style="width: 700px; margin: auto; display: flex; align-items: center; justify-content: start;">
+                <div style="flex: 1; display: inline-block;">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="display: flex; position: relative; width: 100%; align-items: center;">
+                        <input class="mdl-textfield__input" type="text" id="map-newname--value">
+                        <label class="mdl-textfield__label" for="map-newname--value" i1!n data-id="template_map_name">Name of the map</label>
+                    </div>
+                    <div class="dropdownmenu-pane"></div>
+                </div>
+            </div>
+
+            <div id="top_scores" class="scores">
+                <div style="display: flex; align-items: center; justify-content: start;">
+                    <div class="title" style="display: flex;"><i class="material-icons">access_alarm</i><input id="board-time--value" name="time" type="edit" value="" /></div>
+                    <div class="title" style="display: flex;"><i class="material-icons">vpn_key</i><input id="board-keys--value" name="keys" type="edit" value="" /></div>
+
+                    <div style="display: inline-block;">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <select class="mdl-textfield__input" id="skin" onchange="setSkin(this.value);">
+                            <option value="default">default</option>
+                            <option value="bomberman">bomberman</option>
+                            <option value="dwarf">dwarf</option>
+                            </select>
+                            <label class="mdl-textfield__label" for="skin">skin</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- board of the game -->
+            <div id="play_pane">
+                <table height="400" width="400" cellpadding="0" cellspacing="0" style="border: 0;">
+                    <tr>
+                        <td width="20" height="20"><img src="" style="border: 0; width: 20px; height: 20px;" id="hg"></td>
+                        <td width="360" height="20"><img src="" style="border: 0; width: 360px; height: 20px;" id="hh"></td>
+                        <td width="20" height="20"><img src="" style="border: 0; width: 20px; height: 20px;" id="hd"></td>
+                    </tr>
+                    <tr>
+                        <td width="20" height="360"><img src="" style="border: 0; width: 20px; height: 360px;" id="vg"></td>
+                        <td width="360">
+                            <table id="game-board" height="360" width="360" style="border: 0; width: 360px; height: 360px;" cellpadding="0" cellspacing="0"></table>
+                        </td>
+                        <td width="20" height="360"><img src="" style="border: 0; width: 20px; height: 360px;" id="vd"></td>
+                    </tr>
+                    <tr>
+                        <td width="20" height="20"><img src="" style="border: 0; width: 20px; height: 20px;"  id="bg"></td>
+                        <td width="360" height="20"><img src="" style="border: 0; width: 360px; height: 20px;" id="bh"></td>
+                        <td width="20" height="20"><img src="" style="border: 0; width: 20px; height: 20px;" id="bd"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- username and menu button -->
+        <div id="top_controls">
+            <div class="user-name"><span id="user-name--value">Guest user</span></div>
+            <div class="i18n-lang">
+                <select id="lang-selector">
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                </select>
+            </div>
+            <button id="menu-right" class="mdl-button mdl-js-button mdl-button--icon" style="margin-right: 8px;">
+                <i class="material-icons">more_vert</i>
+            </button>
+
+            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="menu-right">
+                <li class="mdl-menu__item" id="menu-login" i18n data-id="menu_login" onclick="window.location.href='/auth';">Login</li>
+                <li class="mdl-menu__item" id="menu-logout" i18n data-id="menu_logout" onclick="window.User.disconnect()">Logout</li>
+                <li class="mdl-menu__item" id="menu-editor" i18n data-id="menu_map_editor" onclick="window.location.href='edit.html';">Map editor</li>
+            </ul>
+        </div>
+
+
+        <!-- right pane: map info + scores -->
+        <div id="right_pane">
+            <div class="map-title" style="margin-top: 50px; padding-left: 10px; display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; width: 100%; height: 25px; line-height: 25px;">
+                    <span id="map-name--value" style="display: inline-block; font-size: 22px; font-weight: bold; max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="nom de la carte beaucoup beaucoup trop long">nom de la carte beaucoup beaucoup trop long</span>
+                    <div style="margin-left: auto;">
+                        <span>Statut:</span>
+                        <span id="map-status--value">Brouillon</span>
+                    </div>
+                </div>
+            </div>
+            <div class="map-details" style="margin-top: 5px; padding-left: 10px; display: flex; align-items: center;">
+                <div class="details" style="flex: 1; display: flex; flex-direction: column;">
+                    <div style="font-size: 14px; color: grey;"><span id="map-author--value" style="margin-right: 5px;">nom de l'auteur</span><span id="map-created--value">23/05/2023</span></div>
+                </div>
+                <div class="" style="margin: 0 5px; display: flex; align-items: center;">
+                    <button id="action-publish--btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="publish();">
+                        <i class="material-icons">publish</i><span i18n data-id="edit_action_publish"> Publier</span>
+                    </button>
+                </div>
+            </div>
+            <div class="map-nav" style="margin-top: 20px; display: flex; align-items: center; justify-content: space-around;">
+                <button id="action-reset--btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="reload();">
+                    <i class="material-icons">delete</i><span i18n data-id="edit_action_reset">Reset</span>
+                </button>
+
+                <button id="action-play--btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="play();" style="width: 110px;">
+                    <i class="material-icons">play_arrow</i><span i18n data-id="edit_action_test">Tester</span>
+                </button>
+
+                <button id="action-stop--btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="stop();" style="width: 110px; display: none;">
+                    <i class="material-icons">stop</i> Stop
+                </button>
+
+                <button id="action-save--btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="save();">
+                    <i class="material-icons">save</i> Sauver
+                </button>
+
+            </div>
+
+            <div class="selector">
+                <div class="choice"><a href="javascript:chooseItem(EMPTY);" title="empty" ><img id="choice0" src="skins/default/blank.gif" alt="empty" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(BUSH);" title="bush"><img id="choice1" src="skins/default/bush.gif" alt="bush" /></a>&nbsp;<a href="javascript:chooseItem(FAKEBUSH);" title="fake bush"><img name="choice8" id="choice8" src="skins/default/fake_bush.gif" alt="fake bush" /></a>&nbsp;</div>
+                <div class="choice"><a href="javascript:chooseItem(BLOCK);" title="block"><img id="choice2" src="skins/default/block.gif" alt="block" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(WATER);" title="water"><img id="choice3" src="skins/default/water.gif" alt="water" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(STAIRS);" title="stairs"><img id="choice4" src="skins/default/steps.gif" alt="stairs" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(KEY);" title="key"><img id="choice5" style="background-color: black" src="skins/default/key.gif" alt="key" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(DOOR);" title="door"><img id="choice6" src="skins/default/door.gif" alt="door" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(GRID);" title="grid"><img id="choice7" src="skins/default/grid.gif" alt="grid" /></a></div>
+                <div class="choice"><a href="javascript:chooseItem(START);" title="set initial position"><img id="choice9" src="skins/default/start.gif" alt="set initial position" /></a></div>
+                <div class="options">
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 10px;"><i class="material-icons">access_alarm</i></div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input id="map-time--value" type="number" class="mdl-textfield__input" style="background: white; width: 85px; height: 30px;">
+                            <label class="mdl-textfield__label" for="timeout" style="overflow: visible;">Time in seconds</label>
+                        </div>
+                        <button class="mdl-button mdl-js-button mdl-button--primary" onclick="decrease(this, 10)">
+                            <i class="material-icons">remove</i>
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--primary" onclick="increase(this, 10)">
+                            <i class="material-icons">add</i>
+                        </button>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 10px;"><i class="material-icons">vpn_key</i></div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input id="map-keys--value" type="number" class="mdl-textfield__input" style="background: white; width: 85px; height: 30px;">
+                            <label class="mdl-textfield__label" for="keys" style="overflow: visible;">Number of keys</label>
+                        </div>
+                        <button class="mdl-button mdl-js-button mdl-button--primary" onclick="decrease(this, 1)">
+                            <i class="material-icons">remove</i>
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--primary" onclick="increase(this, 1)">
+                            <i class="material-icons">add</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- left pane - maps highlights -->
+        <div id="left_pane">
+            <div class="left_pane-menu">
+                <div class="section-selector selected" style="margin: auto; width :30px;" id="section-selector_my">
+                    <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('my')" title="Your maps">
+                        <i class="material-icons">person</i>
+                    </button>
+                </div>
+                <div class="section-selector" style="margin: auto; width :30px;" id="section-selector_drafts">
+                    <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('drafts')" title="Your maps">
+                        <i class="material-icons">unpublished</i>
+                    </button>
+                </div>
+            </div>
+            <div class="left_pane-sections">
+                <div class="section selected" id="section_my">
+                    <div class="title" i18n data-id="section_my">My maps</div>
+                    <div class="maps"></div>
+                </div>
+                <div class="section" id="section_drafts">
+                    <div class="title" i18n data-id="section_drafts">Drafts</div>
+                    <div class="maps"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- popups -->
+        <div class="popup" id="won">
+            <div class="text" i18n data-id="popup_sunk_title">Gagné !</div>
+            <div class="action">
+                <button class="button" onclick="reload()"><span i18n data-id="popup_reload">Relancer</span></button>
+            </div>
+        </div>
+
+        <div class="popup" id="timeout">
+            <div class="text" i18n data-id="popup_sunk_title">Zut, trop lent !</div>
+            <div class="action">
+                <button class="button" onclick="reload()"><span i18n data-id="popup_reload">Relancer</span></button>
+            </div>
+        </div>
+
+        <div class="popup" id="sunk">
+            <div class="text" i18n data-id="popup_sunk_title">Oups, coulé !</div>
+            <div class="action">
+                <button class="button" onclick="reload()"><span i18n data-id="popup_reload">Relancer</span></button>
+            </div>
+        </div>
+
+        <div class="popup" id="loading">
+            <div class="text" style="text-align: center;"><b>LOADING...</b></div>
+        </div>
+
+        <div class="popup" id="saved">
+            <div class="text" i18n data-id="edit_saved">Carte enregistrée</div>
+            <div class="action">
+                <div><button class="button" onclick="publish()"><span i18n data-id="popup_saved_publish_map">Publier cette carte</span></button></div>
+                <div><button class="button" onclick="(() => {window.location.href='./edit.html'})()"><span i18n data-id="popup_saved_new_map">Créer une autre carte</span></button></div>
+            </div>
+        </div>
+
+        <div class="popup" id="published">
+            <div class="text" i18n data-id="edit_published">Carte publiée !</div>
+            <div class="action">
+                <div><button class="button" onclick="(() => { window.location.href='./play.html?level='+$(this).parent().parent().data('data').id })()"><span i18n data-id="popup_published_play_map">Jouer à cette carte</span></button></div>
+                <div><button class="button" onclick="(() => {window.location.href='./edit.html'})()"><span i18n data-id="popup_published_new_map">Créer une autre carte</span></button></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- templates -->
+    <div class="templates" style="display: none;">
+        <div id="template-map">
+            <div class="map-item">
+                <div class="map-thumb"></div>
+                <div style="
+                    font-size: 14px;
+                    text-transform: capitalize;
+                    width: calc(100% - 110px);
+                    margin: 0 10px;">
+                    <div class="map-name">Nom de la map</div>
+                    <div style="display: flex;
+                        justify-content: space-between;"><div class="map-author">auteur </div><div class="map-date">date</div></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div class="map-difficulty"></div>
+                        <div class="" style="margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">favorite</i><span class="map-likes"></span></div>
+                        <div class="" style="margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">play_circle</i><span class="map-games"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="template-player" style="display: flex; padding: 0 10px; align-items: center; justify-content: space-between;">
+            <div class="player-name" style="flex: 1;"></div>
+            <div class="" style="flex: 0 30%; margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">map</i><span class="player-maps"></span></div>
+            <div class="" style="flex: 0 30%; margin: 0 5px; display: flex; align-items: center;"><i class="material-icons" style="transform: scale(0.85);">play_circle</i><span class="player-games"></span></div>
+        </div>
+    </div>
+
+</body>
+</html>

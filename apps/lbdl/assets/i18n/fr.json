@@ -1,0 +1,75 @@
+{
+    "search_map": "Chercher une carte...",
+
+    "menu_login": "Connexion",
+    "menu_logout": "Déconnexion",
+    "menu_map_editor": "Editeur de carte",
+
+    "map_previous": "Prec.",
+    "map_next": "Suiv.",
+    "map_clone": "Cloner cette carte",
+    "map_edit": "Editer la carte",
+
+    "high_scores_title": "Meilleurs scores pour ce niveau",
+
+    "template_map_name": "Nom de la map",
+    "template_map_date": "date",
+    "template_map_author": "auteur",
+
+    "popup_won_text": "Félicitations, tu as réussi cette carte avec un chrono de ",
+    "popup_won_name": "Nom :",
+    "popup_won_score_saved": "Score sauvegardé.",
+    "popup_won_submit": "Soumettre ce score",
+    "popup_won_retry": "Réessayer",
+    "popup_won_next": "Carte suivante",
+
+    "popup_timeout_title": "Zut, trop lent !",
+    "popup_timeout_retry": "Réessayer",
+
+    "popup_sunk_title": "Glou glou glou ... n'oublies pas que tu ne sais pas nager !",
+    "popup_sunk_retry": "Réessayer",
+
+    "popup_reload": "Récharger",
+
+    "popup_saved_publish_map": "Publier la carte",
+    "popup_saved_new_map": "Créer une autre carte",
+
+    "popup_published_new_map": "Créer une autre carte",
+    "popup_published_play_map": "Jouer à cette carte",
+
+    "players_highlight_title": "Les plus joueurs",
+
+    "section_news": "Nouveautés",
+    "section_easy": "Faciles",
+    "section_difficult": "Difficiles",
+    "section_most_played": "Les plus joués",
+    "section_most_liked": "Les plus likés",
+
+    "lbdl_welcome": "Bienvenue à",
+    "lbdl_game": "Le célèbre jeu en ligne désormais",
+    "lbdl_inspired": "inspiré de la série \"The Adventures of Lolo\" sur",
+    "lbdl_here_we_are": "Maintenant que tu es ici, tu peux :",
+    "lbdl_play": "Jouer",
+    "lbdl_play_challenge": "et tenter de battre les meilleurs scores.",
+    "lbdl_create": "Créer",
+    "lbdl_create_share": "de nouvelles cartes à soumettre aux autres joueurs.",
+
+    "presentation_rules": "Les règles",
+    "presentation_rules_water": "Tu ne sais pas nager",
+    "presentation_rules_door": "Une clé ouvre une porte",
+    "presentation_rules_block": "Un bloc permet de franchir l'eau",
+    "presentation_rules_stairs" : "Aux escaliers, c'est gagné !",
+    "presentation_passing": "Ca passe",
+    "presentation_blocking": "Ca passe pas",
+
+    "edit_action_reset": "Réinit.",
+    "edit_action_save": "Sauver",
+    "edit_action_publish": "Publier",
+    "edit_action_test": "Tester",
+
+    "edit_restricted": "Il faut être identifié pour éditer les cartes.",
+    "edit_goto_home": "Aller à la page d'accueil",
+    "edit_auth": "S'identifier",
+    "edit_saved": "Carte sauvegardée !",
+    "edit_published": "Carte publiée!"
+}

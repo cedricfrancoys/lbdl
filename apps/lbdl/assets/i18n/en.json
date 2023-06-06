@@ -1,0 +1,75 @@
+{
+    "search_map": "Search for a map...",
+
+    "menu_login": "Connexion",
+    "menu_logout": "Déconnexion",
+    "menu_map_editor": "Editeur de carte",
+
+    "map_previous": "Prev",
+    "map_next": "Next",
+    "map_clone": "Clone this map",
+    "map_edit": "Edit map",
+
+    "high_scores_title": "Highests scores for this map",
+
+    "template_map_name": "Name of the map",
+    "template_map_date": "date",
+    "template_map_author": "author",
+
+    "popup_won_text": "Congratulations, you completed this map with a time of ",
+    "popup_won_name": "Name :",
+    "popup_won_score_saved": "Score saved.",
+    "popup_won_submit": "Submit score",
+    "popup_won_retry": "Retry",
+    "popup_won_next": "Next map",
+
+    "popup_timeout_title": "Damn, too slow!",
+    "popup_timeout_retry": "Retry",
+
+    "popup_sunk_title": "Glug glug glug ... don't forget that you can't swim!",
+    "popup_sunk_retry": "Retry",
+
+    "popup_reload": "Reload",
+
+    "popup_saved_publish_map": "Publish map",
+    "popup_saved_new_map": "Créate another map",
+
+    "popup_published_new_map": "Create another map",
+    "popup_published_play_map": "Play this map",
+
+    "players_highlight_title": "Biggest gamers",
+
+    "section_news": "Newest",
+    "section_easy": "Easy",
+    "section_difficult": "Difficult",
+    "section_most_played": "Most played",
+    "section_most_liked": "Most liked",
+
+    "lbdl_welcome": "Welcome to",
+    "lbdl_game": "The famous oline game now ",
+    "lbdl_inspired": "inspired by the game series \"The Adventures of Lolo\" on",
+    "lbdl_here_we_are": "Now that you are here, you may :",
+    "lbdl_play": "Play",
+    "lbdl_play_challenge": "and try to beat some high scores.",
+    "lbdl_create": "Create",
+    "lbdl_create_share": "new maps and submit them to the other players.",
+
+    "presentation_rules": "The rules",
+    "presentation_rules_water": "You cannot swim",
+    "presentation_rules_door": "A key opens a door",
+    "presentation_rules_block": "Use blocks to cross the water",
+    "presentation_rules_stairs" : "Reach the stairs and win !",
+    "presentation_passing": "Can pass",
+    "presentation_blocking": "Cannot pass",
+
+    "edit_action_reset": "Reset",
+    "edit_action_save": "Save",
+    "edit_action_publish": "Publish",
+    "edit_action_test": "Test",
+
+    "edit_restricted": "You must be authenticated to edit maps.",
+    "edit_goto_home": "Go to homepage",
+    "edit_auth": "Log in",
+    "edit_saved": "Map saved.",
+    "edit_published": "Map published!"
+}
