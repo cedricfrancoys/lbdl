@@ -18,16 +18,7 @@ list($params, $providers) = eQual::announce([
 
 list($context) = [ $providers['context'] ];
 
-/*
-champs calculés pour les joueurs / users : définir un classe qui enrichit la classe User
-
-    count_games
-    count_won
-    count_maps
-
-    champs mis à jour en fonction des controllers mais aussi calculés sur base des valeurs de Score
-*/
-$result = User::search([], ['sort'  => ['count_maps' => 'desc'], 'limit' => 20])
+$result = User::search([], ['sort'  => ['count_plays' => 'desc'], 'limit' => 20])
     ->read(['firstname', 'count_plays', 'count_maps'])
     ->adapt('json')
     ->get(true);

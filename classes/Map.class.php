@@ -15,7 +15,6 @@ class Map extends Model {
             'name' => [
                 'type'              => 'string',
                 'description'       => 'Name of the map.',
-                'multilang'         => true,
                 'required'          => true
             ],
 
@@ -63,9 +62,12 @@ class Map extends Model {
             ],
 
             'count_likes' => [
-                'type'              => 'integer',
+                'type'              => 'computed',
+                'result_type'       => 'integer',
                 'description'       => "Counter holding the number of times map was played.",
-                'default'           => 0
+                'help'              => 'This is a computed field that depends on `liked_users_ids`.',
+                'function'          => 'calcCountLikes',
+                'store'             => true
             ],
 
             'count_won' => [
@@ -88,8 +90,27 @@ class Map extends Model {
                 'type'              => 'integer',
                 'description'       => "Counter holding the number of times map was won.",
                 'default'           => 1
-            ]
+            ],
 
+            'liked_users_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'lbdl\User',
+                'foreign_field'     => 'liked_maps_ids',
+                'rel_table'         => 'lbdl_rel_like_map_user',
+                'rel_foreign_key'   => 'user_id',
+                'rel_local_key'     => 'map_id',
+                'description'       => 'List of users that liked the map.',
+                'dependencies'      => ['count_likes']
+            ],
+
+            'status' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'draft',
+                    'published'
+                ],
+                'default'           => 'draft'
+            ]
 
         ];
     }
@@ -126,4 +147,12 @@ class Map extends Model {
         return $result;
     }
 
+    public static function calcCountLikes($self) {
+        $result = [];
+        $self->read(['liked_users_ids']);
+        foreach($self as $id => $map) {
+            $result[$id] = count($map['liked_users_ids']);
+        }
+        return $result;
+    }
 }

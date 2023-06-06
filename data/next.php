@@ -45,7 +45,14 @@ $limit = abs($params['offset']);
 $operator = ($params['offset'] > 0)?'>':'<';
 $sort = ($params['offset'] > 0)?'asc':'desc';
 
-$map = Map::search(['id', $operator, $params['id']], ['limit' => $limit, 'sort'  => ['id' => $sort]])->read(['id'])->last();
+$map = Map::search([
+            ['id', $operator, $params['id']],
+            ['status', '=', 'published']
+        ],
+        ['limit' => $limit, 'sort'  => ['id' => $sort]]
+    )
+    ->read(['id'])
+    ->last();
 
 if($map) {
     $result['id'] = $map['id'];

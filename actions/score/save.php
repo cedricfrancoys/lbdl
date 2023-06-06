@@ -15,6 +15,10 @@ list($params, $providers) = eQual::announce([
             'description'       => "Identifier of the Map.",
             'required'          => true
         ],
+        'player' => [
+            'type'              => 'string',
+            'description'       => "Name to use for guest user."
+        ],
         'tries' => [
             'type'              => 'integer',
             'description'       => "Number of attempts.",
@@ -23,6 +27,16 @@ list($params, $providers) = eQual::announce([
         'time' => [
             'type'              => 'integer',
             'description'       => "Race time of the score in milliseconds.",
+            'required'          => true
+        ],
+        'trace' => [
+            'type'              => 'array',
+            'description'       => "Trace of the game, for replay.",
+            'default'           => []
+        ],
+        'token' => [
+            'type'              => 'string',
+            'description'       => "Token relayed from a request to `?get=lbdl_map`. Used to validate the submission.",
             'required'          => true
         ]
     ],
@@ -46,30 +60,62 @@ list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
 $user_id = $auth->userId();
 
-
 if( !$auth->verifyToken($params['token'], constant('AUTH_SECRET_KEY')) ){
     throw new Exception('invalid_token', QN_ERROR_NOT_ALLOWED);
 }
 else {
     $decoded = $auth->decodeToken($params['token']);
-    if($decoded['exp'] > time()) {
+    $payload = $decoded['payload'];
+    if($payload['exp'] < time()) {
         throw new Exception('expired_token', QN_ERROR_NOT_ALLOWED);
     }
-    if($decoded['user_id'] != $user_id || $decoded['map_id'] != $params['map_id']) {
+    if($payload['user_id'] != $user_id || $payload['map_id'] != $params['map_id']) {
         throw new Exception('mismatch_token', QN_ERROR_NOT_ALLOWED);
     }
 }
 
-$values = [
-    'user_id'   => $user_id,
-    'map_id'    => $params['map_id'],
-    'time'      => $params['time'],
-    'tries'     => $params['tries']
-];
+$domain = [['map_id', '=', $params['map_id']]];
 
-$result = Score::create($values)->read(['player', 'user_id', 'map_id']);
+if($user_id == 0) {
+    $domain[] = ['player', '=', $params['player']];
+}
+else {
+    $domain[] = ['user_id', '=', $user_id];
+}
+
+// search for an existing entry for given map
+$score = Score::search($domain)->read(['id', 'tries', 'time'])->first();
+
+if($score) {
+    // increment number of tries
+    $values = [
+        'tries' => ($score['tries'] + $params['tries'])
+    ];
+    // store time only if improved
+    if($score['time'] > $params['time']) {
+        $values['time'] = $params['time'];
+        $values['trace'] = serialize($params['trace']);
+    }
+
+    $result = Score::id($score['id'])
+        ->update($values)
+        ->first(true);
+}
+else {
+    $values = [
+        'user_id'   => $user_id,
+        'map_id'    => $params['map_id'],
+        'time'      => $params['time'],
+        'tries'     => $params['tries'],
+        'trace'     => serialize($params['trace'])
+    ];
+    if($user_id == 0) {
+        $values['player'] = $params['player'];
+    }
+    $result = Score::create($values)->first(true);
+}
 
 $context->httpResponse()
-    ->status(201)
+    ->status(200)
     ->body($result)
     ->send();

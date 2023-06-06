@@ -31,6 +31,8 @@ list($params, $providers) = eQUal::announce([
  */
 list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
+$user_id = $auth->userId();
+
 // create a token for validating subsequent score submissions (valid for 1 day)
 $token = $auth->createToken(['user_id' => $auth->userId(), 'map_id' => $params['id'], 'exp' => time() + 3600*24]);
 
@@ -47,7 +49,8 @@ $map = Map::id($params['id'])
         'time',
         'count_games',
         'count_likes',
-        'difficulty'
+        'difficulty',
+        'status'
     ])
     ->adapt('json')
     ->first(true);
@@ -55,6 +58,9 @@ $map = Map::id($params['id'])
 if(!$map) {
     throw new Exception('unknonw_map', QN_ERROR_UNKNOWN_OBJECT);
 }
+
+// add like status according to current user
+$map['liked'] = (bool) count(Map::search([['id', '=', $params['id']], ['liked_users_ids', 'contains', $user_id]])->ids());
 
 $result = array_merge($map, [
         'direction'         => 12,

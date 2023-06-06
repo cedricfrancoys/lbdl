@@ -7,28 +7,12 @@
 use lbdl\Map;
 
 list($params, $providers) = eQual::announce([
-    'description'   => 'Stores a new score for current user on a given map.',
+    'description'   => 'Add a map from the list of liked map for the current user.',
     'params'        => [
         'id' =>  [
-            'description'       => 'Identifier of the Map to fetch.',
+            'description'       => 'Identifier of the Map liked by the user.',
             'type'              => 'many2one',
             'foreign_object'    => 'lbdl\Map',
-            'required'          => true
-        ],
-        'map_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'lbdl\Map',
-            'description'       => "Identifier of the Map.",
-            'required'          => true
-        ],
-        'tries' => [
-            'type'              => 'integer',
-            'description'       => "Number of attempts.",
-            'required'          => true
-        ],
-        'time' => [
-            'type'              => 'integer',
-            'description'       => "Race time of the score in milliseconds.",
             'required'          => true
         ]
     ],
@@ -46,11 +30,14 @@ list($params, $providers) = eQual::announce([
 
 /**
  * @var \equal\php\Context  $context
+  * @var \equal\auth\AuthenticationManager  $auth
  */
-list($context) = [ $providers['context'] ];
+list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
+$user_id = $auth->userId();
 
-// send back basic info of the User object
+Map::id($params['id'])->update(['liked_users_ids' => [+$user_id]]);
+
 $context->httpResponse()
-    ->body($result)
+    ->status(204)
     ->send();

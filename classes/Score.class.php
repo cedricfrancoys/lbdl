@@ -45,6 +45,11 @@ class Score extends Model {
                 'type'              => 'integer',
                 'description'       => "Duration of the score.",
                 'required'          => true
+            ],
+
+            'trace' => [
+                'type'              => 'string',
+                'description'       => "Trace of the game, used for replays."
             ]
 
         ];
@@ -62,4 +67,11 @@ class Score extends Model {
         return $result;
     }
 
+    public function getUnique() {
+        return [
+            // #memo - user_id might be null
+            // ['user_id', 'map_id'],
+            ['player', 'map_id']
+        ];
+    }
 }

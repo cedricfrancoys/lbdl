@@ -26,6 +26,16 @@ class User extends \core\User {
                 'help'              => "Number of maps that have been played by the user and for which there is a score.",
                 'function'          => 'calcCountMaps',
                 'store'             => true
+            ],
+
+            'liked_maps_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'lbdl\Map',
+                'foreign_field'     => 'liked_users_ids',
+                'rel_table'         => 'lbdl_rel_like_map_user',
+                'rel_foreign_key'   => 'map_id',
+                'rel_local_key'     => 'user_id',
+                'description'       => 'List of maps liked by the user.'
             ]
 
         ];

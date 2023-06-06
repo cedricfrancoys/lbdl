@@ -29,7 +29,9 @@ list($params, $providers) = eQual::announce([
  */
 list($context) = [ $providers['context'] ];
 
-$domain = [];
+$domain = [
+    ['status', '=', 'published']
+];
 
 if(strlen($params['q'])) {
     $domain[] = ['name', 'ilike', "%{$params['q']}%"];

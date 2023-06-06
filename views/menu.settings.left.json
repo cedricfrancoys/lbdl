@@ -52,7 +52,7 @@
                                 }
                             }
                         ]
-                    }                         
+                    }
                 ]
             },
             {
@@ -64,7 +64,7 @@
                 "route": "/",
                 "children": [
                     {
-                        "id": "maps",
+                        "id": "lbdl.maps",
                         "type": "entry",
                         "label": "Maps",
                         "description": "",
@@ -72,7 +72,27 @@
                             "entity": "lbdl\\Map",
                             "view": "list.default"
                         }
-                    }            
+                    },
+                    {
+                        "id": "lbdl.users",
+                        "type": "entry",
+                        "label": "Users",
+                        "description": "",
+                        "context": {
+                            "entity": "lbdl\\User",
+                            "view": "list.default"
+                        }
+                    },
+                    {
+                        "id": "lbdl.scores",
+                        "type": "entry",
+                        "label": "Scores",
+                        "description": "",
+                        "context": {
+                            "entity": "lbdl\\Score",
+                            "view": "list.default"
+                        }
+                    }
                 ]
             }
         ]
