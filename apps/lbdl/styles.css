@@ -908,6 +908,13 @@ table .classementScore{
     line-height: 30px;
 }
 
+.rules-keyboard-text {
+    text-align: center;
+    font-family: 'Lakki Reddy';
+    font-size: 30px;
+    line-height: 30px;
+}
+
 #main_container .spacer {
     cursor: pointer;
 }

@@ -25,17 +25,19 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context' ]
+    'providers'     => [ 'context', 'auth' ]
 ]);
 
 /**
  * @var \equal\php\Context  $context
+ * @var \equal\auth\AuthenticationManager  $auth
  */
-list($context) = [ $providers['context'] ];
+list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
 $map = Map::id($params['id'])->read(['count_games'])->first();
 
 if($map) {
+    $auth->su();
     Map::id($params['id'])->update(['count_games' => ++$map['count_games']]);
 }
 

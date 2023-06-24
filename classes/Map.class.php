@@ -155,4 +155,32 @@ class Map extends Model {
         }
         return $result;
     }
+
+    public static function canupdate($om, $self, $values) {
+        /** @var \equal\auth\AuthenticationManager */
+        $auth = $om->getContainer()->get('auth');
+        $user_id = $auth->userId();
+
+        if($user_id == QN_ROOT_USER_ID) {
+            return true;
+        }
+
+        $self->read(['status', 'creator']);
+
+        $editable_fields = ['name','pos_x','pos_y','board','keys','time','difficulty'];
+        if( count(array_diff(array_keys($values), $editable_fields)) > 0 ) {
+            return ['id' => ['disallowed_field' => 'Only editable fields can be updated by user.']];
+        }
+
+        foreach($self as $id => $map) {
+            if($map['creator'] != $user_id) {
+                return ['id' => ['not_allowed' => 'Only owner can update a map.']];
+            }
+            if($map['status'] != 'draft') {
+                return ['id' => ['not_allowed' => 'Only draft maps can be updated.']];
+            }
+        }
+
+        return [];
+    }
 }

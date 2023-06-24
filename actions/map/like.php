@@ -36,6 +36,7 @@ list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
 $user_id = $auth->userId();
 
+$auth->su();
 Map::id($params['id'])->update(['liked_users_ids' => [+$user_id]]);
 
 $context->httpResponse()

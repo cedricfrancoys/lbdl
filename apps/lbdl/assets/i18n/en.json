@@ -32,10 +32,10 @@
     "popup_reload": "Reload",
 
     "popup_saved_publish_map": "Publish map",
-    "popup_saved_new_map": "Créate another map",
+    "popup_saved_new_map": "Create another map",
 
     "popup_published_new_map": "Create another map",
-    "popup_published_play_map": "Play this map",
+    "popup_published_play_map": "Play",
 
     "players_highlight_title": "Biggest gamers",
 
@@ -44,6 +44,9 @@
     "section_difficult": "Difficult",
     "section_most_played": "Most played",
     "section_most_liked": "Most liked",
+
+    "section_my": "My maps",
+    "section_drafts": "Drafts",
 
     "lbdl_welcome": "Welcome to",
     "lbdl_game": "The famous oline game now ",
@@ -61,6 +64,7 @@
     "presentation_rules_stairs" : "Reach the stairs and win !",
     "presentation_passing": "Can pass",
     "presentation_blocking": "Cannot pass",
+    "presentation_keyboard": "How to play? (keyboard)",
 
     "edit_action_reset": "Reset",
     "edit_action_save": "Save",

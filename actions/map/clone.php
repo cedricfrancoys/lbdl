@@ -30,7 +30,7 @@ list($params, $providers) = eQual::announce([
 
 /**
  * @var \equal\php\Context  $context
-  * @var \equal\auth\AuthenticationManager  $auth
+ * @var \equal\auth\AuthenticationManager  $auth
  */
 list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 

@@ -15,6 +15,7 @@
 <script src="score.js"></script>
 <script src="user.js"></script>
 <script src="lang.js"></script>
+<script src="sections.js"></script>
 
 <script language="Javascript">
 	// default level (map id)
@@ -229,14 +230,7 @@
         // adapt viewport to screen width
         resizeViewport();
 
-		// retrieve level from query string, if any
-		const urlParams = new URLSearchParams(window.location.search);
-		if(urlParams.has('level')) {
-			level = urlParams.get('level');
-			if(level == 'rand') {
-				level = Math.floor(Math.random() * 500 + 1);
-			}
-		}
+        selectSection('news');
 
         // setup search input
         $('#map_search')
@@ -285,8 +279,22 @@
         // best scores for map
         score = new Score();
 
-        load();
         board.listen(true);
+
+        // retrieve level from query string, if any
+		const urlParams = new URLSearchParams(window.location.search);
+		if(urlParams.has('level')) {
+			level = urlParams.get('level');
+			if(level == 'rand') {
+				level = Math.floor(Math.random() * 500 + 1);
+                // make sure the rand ID exists
+                next();
+			}
+            else {
+                load();
+            }
+		}
+
     });
 
     window.onresize = function() {
@@ -433,7 +441,56 @@
 
 
     <!-- left pane - maps highlights -->
-    <div>
+    <div id="left_pane">
+        <div class="left_pane-menu">
+            <div class="section-selector selected" style="margin: auto; width :30px;" id="section-selector_news">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('news')" title="Newest">
+                    <i class="material-icons">fiber_new</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_easy">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('easy')" title="Easy">
+                    <i class="material-icons">wb_twilight</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_difficult">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('difficult')" title="Difficult">
+                    <i class="material-icons">priority_high</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_most-played">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('most-played')" title="Most played">
+                    <i class="material-icons">more_time</i>
+                </button>
+            </div>
+            <div class="section-selector " style="margin: auto; width: 30px;" id="section-selector_most-liked">
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" onclick="selectSection('most-liked')" title="Most liked">
+                    <i class="material-icons">favorite_outline</i>
+                </button>
+            </div>
+        </div>
+        <div class="left_pane-sections">
+            <div class="section selected" id="section_news">
+                <div class="title" i18n data-id="section_news">Nouveautés</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_easy">
+                <div class="title" i18n data-id="section_easy">Faciles</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_difficult">
+                <div class="title" i18n data-id="section_difficult">Difficiles</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_most-played">
+                <div class="title"  i18n data-id="section_most_played">Les plus joués</div>
+                <div class="maps"></div>
+            </div>
+            <div class="section" id="section_most-liked">
+                <div class="title" i18n data-id="section_most_liked">Les plus likés</div>
+                <div class="maps"></div>
+            </div>
+        </div>
     </div>
 
     <!-- template -->

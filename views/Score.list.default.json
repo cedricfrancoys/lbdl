@@ -7,26 +7,6 @@
         "items": [
             {
                 "type": "field",
-                "value": "id",
-                "width": "10%",
-                "sortable": true
-            },
-            {
-                "type": "field",
-                "value": "user_id",
-                "width": "25%",
-                "widget": {
-                    "sortable": true
-                }
-            },
-            {
-                "type": "field",
-                "value": "player",
-                "width": "20%",
-                "sortable": true
-            },
-            {
-                "type": "field",
                 "value": "map_id",
                 "width": "20%",
                 "sortable": true
@@ -37,6 +17,22 @@
                 "width": "15%",
                 "widget": {
                     "usage": "datetime/short",
+                    "sortable": true
+                }
+            },
+            {
+                "type": "field",
+                "label": "Player name",
+                "value": "player",
+                "width": "20%",
+                "sortable": true
+            },
+            {
+                "type": "field",
+                "label": "User",
+                "value": "user_id",
+                "width": "25%",
+                "widget": {
                     "sortable": true
                 }
             },

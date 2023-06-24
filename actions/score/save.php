@@ -60,6 +60,7 @@ list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
 $user_id = $auth->userId();
 
+// creation of a score requires a validation token
 if( !$auth->verifyToken($params['token'], constant('AUTH_SECRET_KEY')) ){
     throw new Exception('invalid_token', QN_ERROR_NOT_ALLOWED);
 }

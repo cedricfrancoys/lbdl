@@ -31,12 +31,13 @@ list($params, $providers) = eQual::announce([
 
 /**
  * @var \equal\php\Context  $context
-  * @var \equal\auth\AuthenticationManager  $auth
+ * @var \equal\auth\AuthenticationManager  $auth
  */
 list($context, $auth) = [ $providers['context'], $providers['auth'] ];
 
 $user_id = $auth->userId();
 
+$auth->su();
 Map::id($params['id'])->update(['liked_users_ids' => [-$user_id]]);
 
 $context->httpResponse()

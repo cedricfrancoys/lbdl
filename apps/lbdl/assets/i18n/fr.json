@@ -32,10 +32,10 @@
     "popup_reload": "Récharger",
 
     "popup_saved_publish_map": "Publier la carte",
-    "popup_saved_new_map": "Créer une autre carte",
+    "popup_saved_new_map": "Nouvelle carte",
 
-    "popup_published_new_map": "Créer une autre carte",
-    "popup_published_play_map": "Jouer à cette carte",
+    "popup_published_new_map": "Nouvelle carte",
+    "popup_published_play_map": "Jouer",
 
     "players_highlight_title": "Les plus joueurs",
 
@@ -44,6 +44,9 @@
     "section_difficult": "Difficiles",
     "section_most_played": "Les plus joués",
     "section_most_liked": "Les plus likés",
+
+    "section_my": "Mes cartes",
+    "section_drafts": "Brouillons",
 
     "lbdl_welcome": "Bienvenue à",
     "lbdl_game": "Le célèbre jeu en ligne désormais",
@@ -61,6 +64,7 @@
     "presentation_rules_stairs" : "Aux escaliers, c'est gagné !",
     "presentation_passing": "Ca passe",
     "presentation_blocking": "Ca passe pas",
+    "presentation_keyboard": "Comment Jouer ? (clavier)",
 
     "edit_action_reset": "Réinit.",
     "edit_action_save": "Sauver",

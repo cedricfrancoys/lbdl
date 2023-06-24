@@ -44,6 +44,14 @@
             },
             {
                 "type": "field",
+                "value": "status",
+                "width": "15%",
+                "widget": {
+                    "sortable": true
+                }
+            },
+            {
+                "type": "field",
                 "value": "keys",
                 "width": "10%"
             },

@@ -13,90 +13,9 @@
 <script src="map.js"></script>
 <script src="user.js"></script>
 <script src="lang.js"></script>
+<script src="sections.js"></script>
 
 <script>
-    function selectSection(section) {
-        console.log('selecting', section);
-        $('#left_pane').find('div.selected').removeClass('selected');
-        $('#section-selector_'+section).addClass('selected');
-        $('#section_'+section).addClass('selected');
-
-        /**
-         * load selected section
-         */
-        var url;
-        switch(section) {
-            case 'news':
-                url = '/?get=model_collect&'+ (new URLSearchParams({
-                    entity: 'lbdl\\Map',
-                    domain: '[status,=,published]',
-                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
-                    limit:15, order: 'created', sort: 'desc'
-                }))
-                .toString();
-                break;
-            case 'easy':
-                url = '/?get=model_collect&'+ (new URLSearchParams({
-                    entity: 'lbdl\\Map',
-                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
-                    limit:15, order: 'difficulty', sort: 'asc'
-                }))
-                .toString();
-                break;
-            case 'difficult':
-                url = '/?get=model_collect&'+ (new URLSearchParams({
-                    entity: 'lbdl\\Map',
-                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
-                    limit:15, order: 'difficulty', sort: 'desc'
-                }))
-                .toString();
-                break;
-            case 'most-played':
-                url = '/?get=model_collect&'+ (new URLSearchParams({
-                    entity: 'lbdl\\Map',
-                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
-                    limit:15, order: 'count_games', sort: 'desc'
-                }))
-                .toString();
-                break;
-            case 'most-liked':
-                url = '/?get=model_collect&'+ (new URLSearchParams({
-                    entity: 'lbdl\\Map',
-                    fields: '{name,board,created,author,count_likes,count_games,difficulty}',
-                    limit:15, order: 'count_likes', sort: 'desc'
-                }))
-                .toString();
-                break;
-        }
-
-        fetch(url)
-        .then(async (response) => {
-            var $template = $('#template-map');
-            const maps = await response.json();
-            maps.forEach( (map) => {
-                const formatter = Intl.NumberFormat('en', { notation: 'compact' });
-                var $map = (new Map(map)).miniMap();
-                var $item = $template.clone().removeAttr('id');;
-                // decorate template
-                $item.find('.map-thumb').append($map);
-                $item.find('.map-name').text(map.name);
-                $item.find('.map-author').text(map.author);
-                $item.find('.map-difficulty').append( $("<img>").prop('src', "assets/img/difficult_"+map.difficulty+".png") );
-                $item.find('.map-date').text(new Date(map.created).toLocaleDateString('fr-BE'));
-                $item.find('.map-likes').text(formatter.format(map.count_likes));
-                $item.find('.map-games').text(formatter.format(map.count_games));
-                $item.on('click', () => {
-                    window.location.href="./play.html?level="+map.id;
-                });
-                // insert item
-                $('#section_'+section).find('.maps').append($item);
-            });
-        })
-        .catch( (response) => {
-            // There was an error
-            console.warn('Something went wrong while requesting section.', response);
-        });
-    }
 
     $(document).ready( () => {
 
@@ -152,10 +71,10 @@
                 <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_create">Créer</span> <span i18n data-id="lbdl_create_share">de nouvelles cartes à soumettre aux autres joueurs.</span>
             </p>
 
-            <div class="spacer" style="height: 60vh;" onclick="window.location.href='./play.html'">
+            <div class="spacer" style="height: 60vh;" onclick="window.location.href='./play.html?level=rand'">
                 <div class="hero">
                     <img src="assets/img/lbdl_hero_play_off.png" style="object-fit: contain; width: 100%;">
-                    <img src="assets/img/lbdl_hero_play_on.png" style="object-fit: contain; width: 100%;">
+                    <img src="assets/img/lbdl_hero_play_on.png"  style="object-fit: contain; width: 100%;">
                 </div>
             </div>
 
@@ -217,6 +136,24 @@
                     <div class="rules-item"><img src="skins/default/bush.gif" style="width: 40px;"></div>
                     <div class="rules-item"><img src="skins/default/grid.gif" style="width: 40px;"></div>
                     <div class="rules-item"><img src="skins/default/door.gif" style="width: 40px;"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 50px; margin-bottom: 40px; font-family: 'Lakki Reddy'; font-size: 40px; text-align: center;" i18n data-id="presentation_keyboard">Clavier</div>
+            <div >
+                <div style="display: flex; align-items: center; justify-content: center; flex-direction: row; justify-content: space-around;">
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="height: 100px;  display: flex; align-items: center;"><img src="assets/img/arrow_keys.png" style="width: 150px;"></div>
+                        <div class="rules-keyboard-text">Move</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="height: 100px; display: flex; align-items: center;"><img src="assets/img/P_key.png" style="width: 60px;"></div>
+                        <div class="rules-keyboard-text">Play</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <div style="height: 100px;  display: flex; align-items: center;"><img src="assets/img/R_key.png" style="width: 60px;"></div>
+                        <div class="rules-keyboard-text">Reload</div>
+                    </div>
                 </div>
             </div>
 
