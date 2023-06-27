@@ -162,7 +162,7 @@ class Map extends Model {
         $user_id = $auth->userId();
 
         if($user_id == QN_ROOT_USER_ID) {
-            return true;
+            return [];
         }
 
         $self->read(['status', 'creator']);
@@ -170,6 +170,12 @@ class Map extends Model {
         $editable_fields = ['name','pos_x','pos_y','board','keys','time','difficulty'];
         if( count(array_diff(array_keys($values), $editable_fields)) > 0 ) {
             return ['id' => ['disallowed_field' => 'Only editable fields can be updated by user.']];
+        }
+
+        $allowed = ['count_games', 'count_likes', 'count_won'];
+
+        if(count(array_diff(array_keys($values), $allowed)) <= 0) {
+            return [];
         }
 
         foreach($self as $id => $map) {
