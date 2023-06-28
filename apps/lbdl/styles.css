@@ -921,21 +921,25 @@ table .classementScore{
 
 #main_container .hero {
     width: 100%;
-    top: 200px;
-    opacity: 1;
-    position: absolute;
-    z-index: -1;
-    user-select: none;
+    height: 100%;
+}
+@media screen and  (max-width: 700px) {
+    #main_container .hero {
+        opacity: 1;
+        position: absolute;
+        z-index: -1;
+        user-select: none;
+    }
 }
 @media screen and (min-width: 590px) and  (max-width: 700px){
     #main_container .hero {
-        top: 300px;
+        top: 100px;
     }
 }
 
 @media screen and (max-width: 589px){
     #main_container .hero {
-        top: 400px;
+        top: 200px;
     }
 }
 
