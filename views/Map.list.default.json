@@ -9,7 +9,8 @@
                 "type": "field",
                 "value": "id",
                 "width": "10%",
-                "sortable": true
+                "sortable": true,
+                "readonly": true
             },
             {
                 "type": "field",
