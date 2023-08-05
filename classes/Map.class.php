@@ -159,9 +159,11 @@ class Map extends Model {
     public static function canupdate($om, $self, $values) {
         /** @var \equal\auth\AuthenticationManager */
         $auth = $om->getContainer()->get('auth');
+        $access = $om->getContainer()->get('access');
+
         $user_id = $auth->userId();
 
-        if($user_id == QN_ROOT_USER_ID) {
+        if($user_id == QN_ROOT_USER_ID || in_array(1, $access->getUserGroups($user_id))) {
             return [];
         }
 
