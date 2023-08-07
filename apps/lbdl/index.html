@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="keywords" content="online playing, online gaming, online games, game, push game, maze game, puzzle game, board game" />
-<meta name="description" content="Come and play to the Little Blue Dwarf Land, feel free to play some levels and to create new ones ..." />
+<meta name="description" content="Come and play to the Little Blue Dwarf Land, feel free to play some levels and to create new ones." />
 <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="styles.css" type="text/css" />
+<link rel="stylesheet" href="assets/styles.css" type="text/css" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&family=Lakki+Reddy">
 <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-<script src="map.js"></script>
-<script src="user.js"></script>
-<script src="lang.js"></script>
-<script src="sections.js"></script>
+<script src="js/map.js"></script>
+<script src="js/user.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/sections.js"></script>
 
 <script>
 
@@ -61,22 +61,20 @@
     <div id="main_container">
         <!-- search bar -->
         <div style="width: 100%; margin: auto; position: relative;">
-            <div style="height: 30vh;">
-                <h1 style="font-family: 'Lakki Reddy'; text-align: center; margin: 0; padding-top: 10px;"><span i18n data-id="lbdl_welcome">Bienvenue à</span> <br />Little Blue Dwarf Land !</h1>
-                <p style="text-align: center;">
-                    <span i18n data-id="lbdl_game">Le célèbre jeu en ligne désormais </span><a href="https://github.com/cedricfrancoys/lbdl">Open Source</a> <span><a href="https://github.com/cedricfrancoys/lbdl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a></span>, <span i18n data-id="lbdl_inspired">inspiré de la série "The Adventures of Lolo" sur </span> <a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System">NES</a>.
-                </p>
-                <p>
-                    <span style="font-family: 'Lakki Reddy'; font-size: 25px;" i18n data-id="lbdl_here_we_are">Maintenant que tu es ici, tu peux :</span><br />
-                    <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_play">Jouer</span> <span i18n data-id="lbdl_play_challenge">et tenter de battre les meilleurs scores.</span><br />
-                    <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_create">Créer</span> <span i18n data-id="lbdl_create_share">de nouvelles cartes à soumettre aux autres joueurs.</span>
-                </p>
-            </div>
+            <h1 style="font-family: 'Lakki Reddy'; text-align: center; margin: 0; padding-top: 10px;"><span i18n data-id="lbdl_welcome">Bienvenue à</span> <br />Little Blue Dwarf Land !</h1>
+            <p style="text-align: center;">
+                <span i18n data-id="lbdl_game">Le célèbre jeu en ligne désormais </span><a href="https://github.com/cedricfrancoys/lbdl">Open Source</a> <span><a href="https://github.com/cedricfrancoys/lbdl"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a></span>, <span i18n data-id="lbdl_inspired">inspiré de la série "The Adventures of Lolo" sur </span> <a href="https://en.wikipedia.org/wiki/Nintendo_Entertainment_System">NES</a>.
+            </p>
+            <p>
+                <span style="font-family: 'Lakki Reddy'; font-size: 25px;" i18n data-id="lbdl_here_we_are">Maintenant que tu es ici, tu peux :</span><br />
+                <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_play">Jouer</span> <span i18n data-id="lbdl_play_challenge">et tenter de battre les meilleurs scores.</span><br />
+                <span style="font-family: 'Lakki Reddy'; font-size: 23px;" i18n data-id="lbdl_create">Créer</span> <span i18n data-id="lbdl_create_share">de nouvelles cartes à soumettre aux autres joueurs.</span>
+            </p>
 
-            <div class="spacer" style="position: relative; height: 60vh;" onclick="window.location.href='./play.html?level=rand'">
+            <div class="spacer" style="height: 60vh;" onclick="window.location.href='./play.html?level=rand'">
                 <div class="hero">
-                    <img src="assets/img/lbdl_hero_play_off.png" style="object-fit: contain; height: 100%; margin: auto;">
-                    <img src="assets/img/lbdl_hero_play_on.png"  style="object-fit: contain; height: 100%; margin: auto;">
+                    <img src="assets/img/lbdl_hero_play_off.png" style="object-fit: contain; width: 100%;">
+                    <img src="assets/img/lbdl_hero_play_on.png"  style="object-fit: contain; width: 100%;">
                 </div>
             </div>
 
