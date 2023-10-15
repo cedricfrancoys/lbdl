@@ -59,7 +59,7 @@ $(document).ready( () => {
     // retrieve user
     User.get()
         .then( (user) => {
-            user.name = user.firstname + ' ' + user.lastname;
+            // user.name = user.firstname + ' ' + user.lastname;
             if(window.hasOwnProperty('player')) {
                 window.player = user;
             }
